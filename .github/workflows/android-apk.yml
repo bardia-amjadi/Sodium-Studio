@@ -34,7 +34,7 @@ jobs:
           -p:AcceptAndroidSDKLicenses=True
 
       - name: Inspect RichEdit package
-        run: >
+        run: |
           dotnet restore
           find ~/.nuget/packages -iname '*richedit*maui*' -o -iname '*codeedit*maui*'
           find ~/.nuget/packages -iname '*.xml' | grep -Ei 'richedit|codeedit' || true
