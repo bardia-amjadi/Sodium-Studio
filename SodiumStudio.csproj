@@ -30,7 +30,7 @@
     <!-- Phase 2 source editor (MIT, preview). Brings RichEdit.Maui transitively; requires
          Microsoft.Maui.Controls >= 10.0.101. If restore reports NU1605/NU1608, set <MauiVersion>
          to at least 10.0.101 or update the MAUI workload. -->
-    <PackageReference Include="CodeEdit.Maui" Version="0.5.0-preview.2" />
+    <PackageReference Include="CodeEdit.Maui" Version="0.4.0-preview.3" />
   </ItemGroup>
 
 </Project>
