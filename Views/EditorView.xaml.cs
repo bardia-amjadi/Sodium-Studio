@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using CodeEdit.Maui;
-using RichEdit.Core;
 using RichEdit.Maui;
-using TextEdit.Core;
 using SodiumStudio.Editing;
 using SodiumStudio.ViewModels;
 
