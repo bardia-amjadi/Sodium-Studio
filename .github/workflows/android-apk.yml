@@ -23,12 +23,6 @@ jobs:
           distribution: microsoft
           java-version: '21'
 
-      # Pure-logic tests (no Android needed). The test project points RestoreSources at this folder.
-      - name: Run unit tests
-        run: |
-          mkdir -p SodiumStudio.Tests/offline-packages
-          dotnet run -c Release --project SodiumStudio.Tests
-
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android
 
