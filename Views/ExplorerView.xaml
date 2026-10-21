@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SodiumStudio.ViewModels"
+             x:Class="SodiumStudio.Views.ExplorerView"
+             x:DataType="vm:ExplorerViewModel">
+
+    <Grid ColumnDefinitions="*,1" BackgroundColor="{StaticResource SidebarBackground}">
+
+        <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*">
+
+            <!-- Header + toolbar -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="12,0,4,0" HeightRequest="48">
+                <Label Grid.Column="0" Text="EXPLORER" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="📄+" Style="{StaticResource ToolButton}"
+                        Command="{Binding NewFileCommand}"
+                        SemanticProperties.Description="New file" />
+                <Button Grid.Column="2" Text="📁+" Style="{StaticResource ToolButton}"
+                        Command="{Binding NewFolderCommand}"
+                        SemanticProperties.Description="New folder" />
+                <Button Grid.Column="3" Text="⟳" Style="{StaticResource ToolButton}"
+                        Command="{Binding RefreshCommand}"
+                        SemanticProperties.Description="Refresh" />
+                <Button Grid.Column="4" Text="⋯" Style="{StaticResource ToolButton}"
+                        Command="{Binding MoreCommand}"
+                        SemanticProperties.Description="More folder actions" />
+            </Grid>
+
+            <!-- Error banner (permission failures, provider errors, partial listing failures) -->
+            <Grid Grid.Row="1" IsVisible="{Binding HasError}" BackgroundColor="{StaticResource ErrorBackground}"
+                  RowDefinitions="Auto,Auto" Padding="12,8">
+                <Label Grid.Row="0" Text="{Binding ErrorMessage}" TextColor="{StaticResource ErrorText}"
+                       FontSize="13" LineBreakMode="WordWrap" />
+                <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,8,0,0">
+                    <Button Text="Retry" Command="{Binding RefreshCommand}" MinimumHeightRequest="36" />
+                    <Button Text="Choose folder" Command="{Binding OpenFolderCommand}" MinimumHeightRequest="36" />
+                    <Button Text="Dismiss" Command="{Binding DismissErrorCommand}" MinimumHeightRequest="36"
+                            BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- Content area: welcome / empty / tree / loading overlay -->
+            <Grid Grid.Row="2">
+
+                <VerticalStackLayout IsVisible="{Binding NoRoot}" Padding="16" Spacing="12" VerticalOptions="Start">
+                    <Label Text="No folder open" FontSize="16" />
+                    <Label Text="Choose a project folder. Sodium Studio can only see the folder you select."
+                           Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                    <Button Text="Open Folder" Command="{Binding OpenFolderCommand}" HorizontalOptions="Start" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout IsVisible="{Binding IsFolderEmpty}" Padding="16" Spacing="8" VerticalOptions="Start">
+                    <Label Text="This folder is empty" FontSize="16" />
+                    <Label Text="Use the new file or new folder buttons above to add items."
+                           Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+
+                <CollectionView ItemsSource="{Binding Items}" IsVisible="{Binding HasRoot}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ExplorerItemViewModel">
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="44">
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource SelectionBackground}" />
+                                    </DataTrigger>
+                                </Grid.Triggers>
+
+                                <!-- Tap target: expand/collapse folders, select files -->
+                                <Grid Grid.Column="0" ColumnDefinitions="20,28,*" Padding="{Binding Indent}"
+                                      Margin="8,0,0,0">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                    <Label Grid.Column="0" Text="{Binding Chevron}" VerticalOptions="Center"
+                                           HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                                    <Label Grid.Column="1" Text="{Binding Icon}" VerticalOptions="Center" />
+                                    <Label Grid.Column="2" Text="{Binding Name}" VerticalOptions="Center"
+                                           LineBreakMode="MiddleTruncation" MaxLines="1" />
+                                </Grid>
+
+                                <!-- Per-item menu (rename, delete, create inside) -->
+                                <Button Grid.Column="1" Text="⋯" Style="{StaticResource ToolButton}"
+                                        Command="{Binding MenuCommand}" CommandParameter="{Binding .}"
+                                        SemanticProperties.Description="Item actions" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Loading overlay (also blocks taps while an operation runs) -->
+                <Grid IsVisible="{Binding IsLoading}" BackgroundColor="#66000000">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" VerticalOptions="Center"
+                                       HorizontalOptions="Center" WidthRequest="32" HeightRequest="32" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <BoxView Grid.Column="1" Color="{StaticResource BorderColor}" WidthRequest="1" />
+    </Grid>
+</ContentView>

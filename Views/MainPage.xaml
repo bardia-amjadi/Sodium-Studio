@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SodiumStudio.ViewModels"
+             xmlns:views="clr-namespace:SodiumStudio.Views"
+             x:Class="SodiumStudio.Views.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="Sodium Studio"
+             BackgroundColor="{StaticResource WindowBackground}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Title bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" BackgroundColor="{StaticResource TitleBarBackground}"
+              HeightRequest="48" Padding="4,0,12,0">
+            <Button Grid.Column="0" Text="☰" Style="{StaticResource ToolButton}"
+                    IsVisible="{Binding IsCompact}" Command="{Binding ToggleExplorerCommand}"
+                    SemanticProperties.Description="Toggle explorer" />
+            <Label Grid.Column="1" Text="{Binding ProjectTitle}" FontSize="15" VerticalOptions="Center"
+                   Margin="8,0,0,0" LineBreakMode="TailTruncation" MaxLines="1" />
+        </Grid>
+
+        <!-- Body: explorer pane + workspace. Placement is switched in MainPage.xaml.cs (ApplyLayout). -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+
+            <!-- Workspace: welcome panel when no file is open, otherwise the editor. -->
+            <Grid x:Name="WorkspacePane" Grid.Column="1">
+
+                <ScrollView IsVisible="{Binding Workspace.NoTabs}">
+                    <VerticalStackLayout Padding="24" Spacing="16" MaximumWidthRequest="640" HorizontalOptions="Center">
+                        <Label Text="Sodium Studio" FontSize="28" />
+
+                        <VerticalStackLayout IsVisible="{Binding NoProject}" Spacing="12">
+                            <Label Text="Open a project folder to get started." LineBreakMode="WordWrap" />
+                            <Label Text="Sodium Studio only gets access to the folder you pick in Android's file picker."
+                                   Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                            <Button Text="Open Folder" Command="{Binding Explorer.OpenFolderCommand}"
+                                    HorizontalOptions="Start" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding HasProject}" Spacing="12">
+                            <Label Text="{Binding ProjectTitle}" FontSize="18" LineBreakMode="TailTruncation" />
+                            <Label Text="Tap a file in the explorer to open it in the editor."
+                                   LineBreakMode="WordWrap" />
+                            <Label Text="{Binding SelectionDetails}" IsVisible="{Binding HasSelection}"
+                                   Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                            <Label Text="Build, run and debugging are not part of this build yet."
+                                   Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                            <Button Text="Browse Files" Command="{Binding ToggleExplorerCommand}"
+                                    IsVisible="{Binding IsCompact}" HorizontalOptions="Start" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <Grid IsVisible="{Binding Workspace.HasTabs}">
+                    <views:EditorView BindingContext="{Binding Workspace}" />
+                </Grid>
+            </Grid>
+
+            <!-- Dims the workspace behind the explorer drawer on phones; tap to close. -->
+            <BoxView x:Name="Scrim" Grid.Column="0" Grid.ColumnSpan="2" Color="#99000000" IsVisible="False">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseExplorerCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <views:ExplorerView x:Name="ExplorerPane" Grid.Column="0" BindingContext="{Binding Explorer}" />
+        </Grid>
+
+        <!-- Status bar -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" BackgroundColor="{StaticResource StatusBarBackground}"
+              HeightRequest="26" Padding="12,0" ColumnSpacing="12">
+            <Label Grid.Column="0" Text="{Binding StatusText}" TextColor="White" FontSize="12"
+                   VerticalOptions="Center" LineBreakMode="TailTruncation" MaxLines="1" />
+            <Label Grid.Column="1" Text="{Binding Workspace.StatusDetails}" TextColor="White" FontSize="12"
+                   VerticalOptions="Center" LineBreakMode="TailTruncation" MaxLines="1" />
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SodiumStudio.ViewModels"
+             xmlns:proj="clr-namespace:SodiumStudio.Projects"
+             x:Class="SodiumStudio.Views.NewProjectPage"
+             x:DataType="vm:NewProjectViewModel"
+             Title="New project"
+             BackgroundColor="{StaticResource WindowBackground}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+
+        <Label Grid.Row="0" Text="{Binding Heading}" FontSize="18" LineBreakMode="TailTruncation" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="12">
+
+                <Label Text="TEMPLATE" Style="{StaticResource CaptionLabel}" />
+                <CollectionView ItemsSource="{Binding Templates}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                HeightRequest="320">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="proj:ProjectTemplate">
+                            <Grid Padding="12,8" RowDefinitions="Auto,Auto" MinimumHeightRequest="48">
+                                <Label Grid.Row="0" Text="{Binding DisplayName}" FontSize="15" />
+                                <Label Grid.Row="1" Text="{Binding Description}" Style="{StaticResource CaptionLabel}"
+                                       LineBreakMode="WordWrap" />
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="{StaticResource SelectionBackground}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="PROJECT NAME" Style="{StaticResource CaptionLabel}" />
+                <Entry Text="{Binding ProjectName, Mode=TwoWay}" ReturnType="Done"
+                       SemanticProperties.Description="Project name" />
+
+                <Grid IsVisible="{Binding HasError}" BackgroundColor="{StaticResource ErrorBackground}" Padding="10">
+                    <Label Text="{Binding Error}" TextColor="{StaticResource ErrorText}" />
+                </Grid>
+
+                <Grid BackgroundColor="{StaticResource InfoBackground}" Padding="10">
+                    <Label Text="{Binding ToolchainNote}" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="12">
+            <Button Grid.Column="0" Text="Cancel" Command="{Binding CancelCommand}"
+                    BackgroundColor="{StaticResource DisabledBackground}" />
+            <Button Grid.Column="1" Text="Create" Command="{Binding CreateCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:code="clr-namespace:CodeEdit.Maui;assembly=CodeEdit.Maui"
+             xmlns:vm="clr-namespace:SodiumStudio.ViewModels"
+             x:Class="SodiumStudio.Views.EditorView"
+             x:DataType="vm:EditorWorkspaceViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{StaticResource WindowBackground}">
+
+        <!-- Tab strip -->
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Tabs}" ItemsLayout="HorizontalList"
+                        SelectionMode="None" HeightRequest="40"
+                        BackgroundColor="{StaticResource TitleBarBackground}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:EditorTabViewModel">
+                    <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="*,2" BackgroundColor="Transparent">
+                        <Grid.Triggers>
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsActive}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource WindowBackground}" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+
+                        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6" Padding="12,0,0,0"
+                                               VerticalOptions="Center">
+                            <HorizontalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectCommand}" CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout.GestureRecognizers>
+                            <Label Text="{Binding Title}" VerticalOptions="Center" MaxLines="1" />
+                            <Label Text="{Binding DirtyMark}" TextColor="{StaticResource Accent}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
+                        <Button Grid.Row="0" Grid.Column="1" Text="✕" Style="{StaticResource ToolButton}"
+                                WidthRequest="36" MinimumWidthRequest="36" FontSize="12"
+                                Command="{Binding CloseCommand}" CommandParameter="{Binding .}"
+                                SemanticProperties.Description="Close tab" />
+
+                        <BoxView Grid.Row="1" Grid.ColumnSpan="2" Color="{StaticResource Accent}"
+                                 IsVisible="{Binding IsActive}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto" Padding="4,0"
+              BackgroundColor="{StaticResource SidebarBackground}" HeightRequest="44">
+            <Button Grid.Column="0" Text="💾" Style="{StaticResource ToolButton}" Command="{Binding SaveCommand}"
+                    SemanticProperties.Description="Save" />
+            <Button Grid.Column="1" Text="↶" Style="{StaticResource ToolButton}" Clicked="OnUndoClicked"
+                    SemanticProperties.Description="Undo" />
+            <Button Grid.Column="2" Text="↷" Style="{StaticResource ToolButton}" Clicked="OnRedoClicked"
+                    SemanticProperties.Description="Redo" />
+            <Button Grid.Column="3" Text="🔍" Style="{StaticResource ToolButton}" Clicked="OnToggleFindClicked"
+                    SemanticProperties.Description="Find and replace" />
+            <Button Grid.Column="5" Text="⋯" Style="{StaticResource ToolButton}"
+                    Command="{Binding EditorOptionsCommand}" SemanticProperties.Description="Editor options" />
+        </Grid>
+
+        <!-- The editor manages its own scrolling, so it sits in a bounded star row. -->
+        <code:CodeEditor x:Name="CodeBox" Grid.Row="2" BackgroundColor="{StaticResource WindowBackground}" />
+
+        <!-- Find / replace -->
+        <Grid x:Name="FindBar" Grid.Row="3" IsVisible="False" RowDefinitions="Auto,Auto,Auto" Padding="8,6"
+              RowSpacing="6" BackgroundColor="{StaticResource SidebarBackground}">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="4">
+                <Entry x:Name="FindEntry" Grid.Column="0" Placeholder="Find" ReturnType="Search"
+                       TextChanged="OnFindTextChanged" Completed="OnFindNextClicked" />
+                <Button Grid.Column="1" Text="▲" Style="{StaticResource ToolButton}" Clicked="OnFindPreviousClicked"
+                        SemanticProperties.Description="Previous match" />
+                <Button Grid.Column="2" Text="▼" Style="{StaticResource ToolButton}" Clicked="OnFindNextClicked"
+                        SemanticProperties.Description="Next match" />
+                <Button x:Name="CaseButton" Grid.Column="3" Text="Aa" Style="{StaticResource ToolButton}"
+                        Clicked="OnCaseClicked" SemanticProperties.Description="Match case" />
+                <Button Grid.Column="4" Text="✕" Style="{StaticResource ToolButton}" Clicked="OnCloseFindClicked"
+                        SemanticProperties.Description="Close find" />
+            </Grid>
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+                <Entry x:Name="ReplaceEntry" Grid.Column="0" Placeholder="Replace with" />
+                <Button Grid.Column="1" Text="Replace" Clicked="OnReplaceClicked" MinimumHeightRequest="40" />
+                <Button Grid.Column="2" Text="All" Clicked="OnReplaceAllClicked" MinimumHeightRequest="40" />
+            </Grid>
+            <Label x:Name="FindStatus" Grid.Row="2" Style="{StaticResource CaptionLabel}" />
+        </Grid>
+    </Grid>
+</ContentView>

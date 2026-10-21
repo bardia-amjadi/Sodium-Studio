@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SodiumStudio.ViewModels"
+             x:Class="SodiumStudio.Views.ProjectSettingsPage"
+             x:DataType="vm:ProjectSettingsViewModel"
+             Title="Project settings"
+             BackgroundColor="{StaticResource WindowBackground}">
+
+    <Grid RowDefinitions="*,Auto" Padding="16" RowSpacing="12">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Project settings" FontSize="18" />
+
+                <Label Text="NAME" Style="{StaticResource CaptionLabel}" />
+                <Entry Text="{Binding Name, Mode=TwoWay}" SemanticProperties.Description="Project name" />
+
+                <Label Text="LANGUAGE" Style="{StaticResource CaptionLabel}" />
+                <Picker ItemsSource="{Binding LanguageNames}"
+                        SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}"
+                        Title="Language" />
+
+                <Label Text="ENTRY POINT (relative path, optional)" Style="{StaticResource CaptionLabel}" />
+                <Entry Text="{Binding EntryPoint, Mode=TwoWay}" Placeholder="src/main.py" />
+
+                <Label Text="ARGUMENTS (quote values containing spaces)" Style="{StaticResource CaptionLabel}" />
+                <Entry Text="{Binding ArgumentsLine, Mode=TwoWay}" Placeholder="--verbose &quot;two words&quot;" />
+
+                <Grid IsVisible="{Binding HasError}" BackgroundColor="{StaticResource ErrorBackground}" Padding="10">
+                    <Label Text="{Binding Error}" TextColor="{StaticResource ErrorText}" />
+                </Grid>
+
+                <Grid BackgroundColor="{StaticResource InfoBackground}" Padding="10">
+                    <Label Text="{Binding ToolchainNote}" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
+            <Button Grid.Column="0" Text="Cancel" Command="{Binding CancelCommand}"
+                    BackgroundColor="{StaticResource DisabledBackground}" />
+            <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

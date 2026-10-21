@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<!--
+		No storage or network permissions are declared on purpose: project access goes through the
+		Storage Access Framework (user-granted folder), and Phase 1 needs no network.
+	-->
+	<application android:allowBackup="false"
+	             android:icon="@mipmap/appicon"
+	             android:roundIcon="@mipmap/appicon_round"
+	             android:supportsRtl="true"></application>
+</manifest>
